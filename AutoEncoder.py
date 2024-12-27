@@ -64,40 +64,41 @@ class CustomDataset(Dataset):
         
         return torch.tensor(img)
 
-# データセットとデータローダの作成
-image_dir = 'make_fig/fig_data'  # 画像ディレクトリ
-dataset = CustomDataset(image_dir)
-train_loader = DataLoader(dataset, batch_size=1024, shuffle=True)
-
-# モデル、損失関数、最適化アルゴリズムの定義
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = AutoEncoder().to(device)
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
-
-# 訓練ループ
-num_epochs = 20
-for epoch in range(num_epochs):
-    model.train()
-    running_loss = 0.0
-    for batch_idx, data in enumerate(train_loader):
-        data = data.to(device)
-        
-        # 順伝播
-        optimizer.zero_grad()
-        outputs = model(data)
-        
-        # 損失の計算
-        loss = criterion(outputs, data)
-        
-        # 逆伝播
-        loss.backward()
-        optimizer.step()
-        
-        running_loss += loss.item()
+if __name__ == "__main__":
+    # データセットとデータローダの作成
+    image_dir = 'make_fig/fig_data'  # 画像ディレクトリ
+    dataset = CustomDataset(image_dir)
+    train_loader = DataLoader(dataset, batch_size=1024, shuffle=True)
     
-    avg_loss = running_loss / len(train_loader)
-    print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}")
-
-# 訓練後のモデルの保存（任意）
-torch.save(model.state_dict(), "hydrus_autoencoder_model.pth")
+    # モデル、損失関数、最適化アルゴリズムの定義
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = AutoEncoder().to(device)
+    criterion = nn.MSELoss()
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    
+    # 訓練ループ
+    num_epochs = 20
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+        for batch_idx, data in enumerate(train_loader):
+            data = data.to(device)
+            
+            # 順伝播
+            optimizer.zero_grad()
+            outputs = model(data)
+            
+            # 損失の計算
+            loss = criterion(outputs, data)
+            
+            # 逆伝播
+            loss.backward()
+            optimizer.step()
+            
+            running_loss += loss.item()
+        
+        avg_loss = running_loss / len(train_loader)
+        print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}")
+    
+    # 訓練後のモデルの保存（任意）
+    torch.save(model.state_dict(), "hydrus_autoencoder_model.pth")
