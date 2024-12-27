@@ -10,7 +10,6 @@ class AutoEncoder(nn.Module):
     def __init__(self):
         super(AutoEncoder, self).__init__()
         # エンコーダ
-        # エンコーダ
         self.encoder = nn.Sequential(
             nn.Conv2d(1, 16, kernel_size=3, stride=2, padding=1),  # (1, 100, 100) -> (16, 50, 50)
             nn.ReLU(),
@@ -21,12 +20,12 @@ class AutoEncoder(nn.Module):
             nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),  # (64, 13, 13) -> (128, 7, 7)
             nn.ReLU(),
             nn.Flatten(),
-            nn.Linear(128*7*7, 32)  # 圧縮次元数
+            nn.Linear(128*7*7, 4096),  # 圧縮次元数
         )
         
         # デコーダ
         self.decoder = nn.Sequential(
-            nn.Linear(32, 128*7*7),
+            nn.Linear(4096, 128*7*7),
             nn.ReLU(),
             nn.Unflatten(1, (128, 7, 7)),
             nn.ConvTranspose2d(128, 64, kernel_size=3, stride=2, padding=1, output_padding=1),  # (128, 7, 7) -> (64, 14, 14)
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
     
     # 訓練ループ
-    num_epochs = 20
+    num_epochs = 1000
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
